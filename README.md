@@ -136,7 +136,7 @@ public enum SingletonEnum implements EnumSingleton {
 
 #### (6) 容器单例模式；
 在程序的初始。将多种单例类型注入到一个统一的管理类中，在使用时根据key获取对应类型的对象。
-比如ContextImpl就是使用这种方式来获取对应的service。
+比如ContextImpl就是使用这种方式来获取对应的service，各种系统服务都会注册到ContextImpl的map容器中。然后需要获取服务的时候就通过map的key来获取。
 
 LayoutInflater的实现类的是<b>PhoneLayoutInflater</b>。
 ##### inflate方法主要包括以下几步：
@@ -158,7 +158,76 @@ LayoutInflater的实现类的是<b>PhoneLayoutInflater</b>。
 Android-Universal-Image-Loader也是使用到（DCL）单例模式。
 
 ### 2. Builder模式
-TODO
+#### 定义：
+将一个复杂对象的构建和表示分离，使得同样的构建过程可以创建不同的表示。同时，也是将配置从目标类中隔离出来，避免过多的setter方法。
+
+#### 优点：
+(1)良好的封装性，使用Builder模式可以使客户端不必关心产品内部组成的细节。<br>
+(2)builder独立，易于扩展。
+
+#### 使用场景
+(1)相同的方法，不同的执行顺序，产生不同的事件结果时；<br>
+(2)多个部件或零件，都可以装配到一个对象中，但是产生的运行结果又不相同时；<br>
+(3)产品类非常复杂，或者产品类的调用顺序不同产生了不同的作用时；<br>
+(4)当初始化一个对象特别复杂，如参数多，且很多参数都具有了默认值时。<br>
+
+#### Android源码中的Builder模式
+##### AlertDialog.Builder
+<b>使用如下：</b> <br>
+```java
+public static void showAlertDialog(final Context context) {
+    AlertDialog.Builder builder = new AlertDialog.Builder(context);
+    builder.setTitle("title");
+    builder.setMessage("message");
+    builder.setPositiveButton("确定", new DialogInterface.OnClickListener() {
+        @Override
+        public void onClick(DialogInterface dialog, int which) {
+            Toast.makeText(context, "点击了确定按钮", Toast.LENGTH_SHORT).show();
+        }
+    });
+
+    builder.setNegativeButton("取消", new DialogInterface.OnClickListener() {
+        @Override
+        public void onClick(DialogInterface dialog, int which) {
+            Toast.makeText(context, "点击了取消按钮", Toast.LENGTH_SHORT).show();
+        }
+    });
+
+    builder.show();
+}
+```
+<b>核心思想：</b> <br>
+(1)首先，Builder是AlertDialog的一个静态内部类；<br>
+(2)Builder类可以设置AlertDialog中的title、message、button等参数，这些参数都存储在类型为AlertParams的成员变量P中。<br>
+在调用Builder类的create函数时会创建AlertDialog，并且将Builder成员变量P保存的参数应用到AlertDialog的mAlert对象中，即通过P.apply（dialog.mAlert）实现。<br>
+(3)Builder中的每个setXXX方法都是会返回builder自身对象，这样可以实现链式调用，如上使用方式。如：
+```java
+public Builder setTitle(@Nullable CharSequence title) {
+    P.mTitle = title;
+    return this;
+}
+```
+(4)AlertDialog通过onCreate函数中调用了AlertController的installContent方法，而installContent方法里头，使用setContentView设置了内容视图布局，类似activity。如下：
+```java
+public void installContent() {
+    final int contentView = selectContentView();
+    mDialog.setContentView(contentView);
+    setupView();
+}
+```
+(5)如上installContent中有一个setupView方法，该方法用来初始化AlertDialog布局中的各个部分，如title、message、title区域等。<br>
+
+#### WindowManager
+(1)所有需要显示到屏幕上的view最终是通过WindowManager来操作的。<br>
+(2)Window对象通过setWindowManager方法将Window对象与WindowManager对象建立了联系。<br>
+(3)ViewRootImpl继承自Handler，作为native层与java层View系统通信的桥梁; <br>
+(4)Android Framework与WMS之间也是通过Binder机制进行通信；<br>
+(5)视图的绘制过程包括测量（Measure）、布局(Layout)、绘制(Draw)，其中draw过程可以分为以下几个步骤：
+    1）判断是使用CPU绘制还是GPU绘制；
+    2）获取绘制表面Surface对象；
+    3）通过Surface对象获取并且锁住Canvas绘图对象；
+    4）从DecorView开始发起整棵视图树的绘制流程；
+    5）Surface对象解锁Canvas，并且通知SurfaceFlinger更新视图。
 
 ### 3. 原型模式
 
