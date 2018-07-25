@@ -223,11 +223,11 @@ public void installContent() {
 (3)ViewRootImpl继承自Handler，作为native层与java层View系统通信的桥梁; <br>
 (4)Android Framework与WMS之间也是通过Binder机制进行通信；<br>
 (5)视图的绘制过程包括测量（Measure）、布局(Layout)、绘制(Draw)，其中draw过程可以分为以下几个步骤：<br>
-    1）判断是使用CPU绘制还是GPU绘制；<br>
-    2）获取绘制表面Surface对象；<br>
-    3）通过Surface对象获取并且锁住Canvas绘图对象；<br>
-    4）从DecorView开始发起整棵视图树的绘制流程；<br>
-    5）Surface对象解锁Canvas，并且通知SurfaceFlinger更新视图。<br>
+&nbsp;&nbsp; 1）判断是使用CPU绘制还是GPU绘制；<br>
+&nbsp;&nbsp; 2）获取绘制表面Surface对象；<br>
+&nbsp;&nbsp; 3）通过Surface对象获取并且锁住Canvas绘图对象；<br>
+&nbsp;&nbsp; 4）从DecorView开始发起整棵视图树的绘制流程；<br>
+&nbsp;&nbsp; 5）Surface对象解锁Canvas，并且通知SurfaceFlinger更新视图。<br>
 
 ### 3. 原型模式
 
