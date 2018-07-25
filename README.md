@@ -230,6 +230,91 @@ public void installContent() {
 &nbsp;&nbsp; 5）Surface对象解锁Canvas，并且通知SurfaceFlinger更新视图。<br>
 
 ### 3. 原型模式
+#### 定义
+用原型实例指定创建对象的种类，并通过复制这些原型创建新的对象。
+
+#### 使用场景
+（1）类初始化需要消耗非常多的资源，这个资源包括数据、硬件资源等，通过原型复制避免这些开销；<br>
+（2）通过new产生一个对象需要非常繁琐的数据准备或访问权限，这时可以使用原型模式；<br>
+（3）一个对象需要提供给其它对象访问，而且各个调用者可能都需要修改其值时，可以考虑使用原型模式复制多个对象供调用者使用，即保护性拷贝。
+&nbsp;&nbsp; 需要注意的是，通过实现Cloneable接口的原型模式在调用clone函数构造实例的时候并不一定比通过new操作速度快，只有当通过new构造对象
+较为耗时或者说成本较高时，通过clone方法才能获得效率上的提升。当然，实现原型模式也不一定要实现Cloneable接口。
+
+#### 原型模式的三大角色
+<b>Client</b>: 客户端用户<br>
+<b>Prototype</b>: 抽象类或者接口，声明具备clone能力<br>
+<b>ConcretePrototype</b>: 具体的原型类<br>
+
+#### 原型模式的简单实现
+```java
+public class WordDocument implements Cloneable {
+    // 文本
+    private String mText;
+    // 图片名列表
+    private ArrayList<String> mImages = new ArrayList<>();
+
+    public WordDocument() {
+        System.out.println("---------------- WordDocument构造函数 ----------------");
+    }
+
+    public String getText() {
+        return mText;
+    }
+
+    public void setText(String text) {
+        mText = text;
+    }
+
+    public List<String> getImages() {
+        return mImages;
+    }
+
+    public void addImage(String imageName) {
+        mImages.add(imageName);
+    }
+
+    public void showDocument() {
+        System.out.println("---------------- Word Content Start ----------------");
+        System.out.println("Text: " + mText);
+        System.out.println("Images List: ");
+        for (String imgName: mImages) {
+            System.out.println("image name: " + imgName);
+        }
+        System.out.println("---------------- Word Content End ----------------");
+    }
+
+    @Override
+    protected WordDocument clone() {
+        try {
+            WordDocument document = (WordDocument) super.clone();
+            document.mText = this.mText;
+//            document.mImages = this.mImages; // 浅拷贝。 这样话，会导致拷贝出来的文档对象的图片对象和原型文档对象中的图片对象是同一对象
+            document.mImages = (ArrayList<String>) this.mImages.clone(); // 深拷贝。这样，就相当于拷贝了一份图片对象。
+            return document;
+        } catch (CloneNotSupportedException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+}
+```
+<b>注意：通过clone拷贝对象时并不会执行构造函数。</b>
+
+#### Android源码中的原型模式实现
+java中：ArrayList就是原型模式
+
+##### Intent
+（1）intent用于activity跳转、启动服务、发布广播等功能，它是android系统各组件之间的纽带，也是组件之间传递数据的载体。目的是让Android组件之间低耦合。<br>
+（2）intent.clone()其实调用的是new Intent(this)，至于不用super.clone来实现对象拷贝的原因是由于构造intent对象的成本不是很高，因此直接new比clone更高效。<br>
+
+#### Intent的查找组件的过程
+大致思路如下: 在系统启动时PackageManagerService（PMS）会启动，此时PMS将解析所有已安装的应用的信息，构建一个信息表，
+当用户通过Intent来跳转到某个组件时，会根据Intent中包含的信息到PMS中查找对应的组件列表，最后跳转到目标组件。
+
+#### 小结
+原型拷贝本质上是对象拷贝，有浅拷贝和深拷贝之分。有两个用处：<br>
+1）解决构建复杂对象的资源消耗问题，能够在某些场景下提升创建对象的效率；<br>
+2）保护性拷贝，也就是某个对象对外可能是只读的。<br>
 
 ### 4. 工作方法模式
 
