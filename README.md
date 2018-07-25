@@ -211,6 +211,6 @@ android中的view的事件分发就用到该模式。
 ### (3) MVVM
 
 
-##致谢
+## 致谢
 《Android源码设计模式解析与实战》(第2版) 何红辉 关爱民
 https://book.douban.com/subject/30199128/
