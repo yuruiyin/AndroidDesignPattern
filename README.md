@@ -140,10 +140,10 @@ public enum SingletonEnum implements EnumSingleton {
 
 LayoutInflater的实现类的是<b>PhoneLayoutInflater</b>。
 ##### inflate方法主要包括以下几步：
-（1）解析xml中的根标签；
-（2）如果根标签是merge，那么调用rInflate进行解析，rInflate会将merge标签下的所有子view直接添加到根标签中；
-（3）如果标签是普通元素，则调用createViewFromTag对该元素进行解析；
-（4）调用rInflate解析temp根元素下的所有子View，并且将这些子view都添加到temp下；
+（1）解析xml中的根标签；<br>
+（2）如果根标签是merge，那么调用rInflate进行解析，rInflate会将merge标签下的所有子view直接添加到根标签中；<br>
+（3）如果标签是普通元素，则调用createViewFromTag对该元素进行解析；<br>
+（4）调用rInflate解析temp根元素下的所有子View，并且将这些子view都添加到temp下；<br>
 （5）返回解析到根视图。
 
 ##### createViewFromTag： 
@@ -222,12 +222,12 @@ public void installContent() {
 (2)Window对象通过setWindowManager方法将Window对象与WindowManager对象建立了联系。<br>
 (3)ViewRootImpl继承自Handler，作为native层与java层View系统通信的桥梁; <br>
 (4)Android Framework与WMS之间也是通过Binder机制进行通信；<br>
-(5)视图的绘制过程包括测量（Measure）、布局(Layout)、绘制(Draw)，其中draw过程可以分为以下几个步骤：
-    1）判断是使用CPU绘制还是GPU绘制；
-    2）获取绘制表面Surface对象；
-    3）通过Surface对象获取并且锁住Canvas绘图对象；
-    4）从DecorView开始发起整棵视图树的绘制流程；
-    5）Surface对象解锁Canvas，并且通知SurfaceFlinger更新视图。
+(5)视图的绘制过程包括测量（Measure）、布局(Layout)、绘制(Draw)，其中draw过程可以分为以下几个步骤：<br>
+    1）判断是使用CPU绘制还是GPU绘制；<br>
+    2）获取绘制表面Surface对象；<br>
+    3）通过Surface对象获取并且锁住Canvas绘图对象；<br>
+    4）从DecorView开始发起整棵视图树的绘制流程；<br>
+    5）Surface对象解锁Canvas，并且通知SurfaceFlinger更新视图。<br>
 
 ### 3. 原型模式
 
