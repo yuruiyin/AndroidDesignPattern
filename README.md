@@ -317,8 +317,29 @@ java中：ArrayList就是原型模式
 2）保护性拷贝，也就是某个对象对外可能是只读的。<br>
 
 ### 4. 工作方法模式
+#### 定义
+定义一个用于创建对象的接口，让子类决定实例化哪个类。
+
+#### 使用场景
+在任何需要生成复杂对象的地方，都可以使用工厂方法模式。
+
+#### 几种创建方法
+（1）一个产品对应一个具体工厂类；<br>
+（2）多个产品就一个具体工厂类，通过传入的class类型进行反射生产出具体的产品类。<br>
+
+#### Android源码中的工厂方法模式
+（1）ArrayList和HashSet中的iterator方法就相当于一个工厂方法。该方法返回一个具体的迭代器。<br>
+（2）Activity的onCreate方法其实也是一个工厂方法，它会构造一个View对象，并设置为当前界面的ContentView返回给Framework层处理。
+
+#### 关于onCreate方法
+（1）其实我们的主Activity并非应用的程序入口，真正的入口应该是ActivityThread类。可以发现ActivityThread里头有我们熟悉的main函数。<br>
+（2）ActivityThread是一个final类，是不能被继承的。<br>
+（3）当Zygote进程孵化出一个新的应用进程后，会执行ActivityThread的main方法，其中main方法做了一些比较常规的逻辑，如准备Looper和消息队
+然后调用ActivityThread的attach方法将其绑定到ActivityManagerService中，开始不断地读取消息队列中的消息并分发消息。<br>
+（4）ActivityThread内部有一个继承与Handler的子类H，负责处理消息。比如处理LAUNCH_ACTIVITY的消息。<br>
 
 ### 5. 抽象工厂模式
+TODO
 
 ### 6. 策略模式
 
