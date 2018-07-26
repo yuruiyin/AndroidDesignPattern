@@ -334,7 +334,7 @@ java中：ArrayList就是原型模式
 #### 关于onCreate方法
 （1）其实我们的主Activity并非应用的程序入口，真正的入口应该是ActivityThread类。可以发现ActivityThread里头有我们熟悉的main函数。<br>
 （2）ActivityThread是一个final类，是不能被继承的。<br>
-（3）当Zygote进程孵化出一个新的应用进程后，会执行ActivityThread的main方法，其中main方法做了一些比较常规的逻辑，如准备Looper和消息队
+（3）当Zygote进程孵化出一个新的应用进程后，会执行ActivityThread的main方法，其中main方法做了一些比较常规的逻辑，如准备Looper和消息队列，
 然后调用ActivityThread的attach方法将其绑定到ActivityManagerService中，开始不断地读取消息队列中的消息并分发消息。<br>
 （4）ActivityThread内部有一个继承与Handler的子类H，负责处理消息。比如处理LAUNCH_ACTIVITY的消息。<br>
 
