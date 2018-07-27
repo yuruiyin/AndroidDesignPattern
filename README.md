@@ -356,6 +356,82 @@ java中：ArrayList就是原型模式
 （2）不太容易扩展新的产品类，因为每当我们增加一个产品类就需要修改抽象工厂，那么所有的具体工厂类都需要被修改。
 
 ### 6. 策略模式
+#### 定义
+策略模式定义了一系列的算法，并将每一个算法封装起来，而且使它们还可以相互替换。
+
+#### 使用场景
+（1）针对同一类型问题的多种处理方式，仅仅是具体行为有差别时；<br>
+（2）需要安全地封装多种同一类型的操作时； <br>
+（3）出现同一抽象类有多个子类，而又需要使用if-else或者switch-case选择具体子类时。<br>
+
+#### 如何创建策略模式
+大致思路就是：抽象出一个Strategy的接口，然后不同的算法对应不同的具体Strategy类，实现了Strategy接口。
+同时有一个Context角色，起到一个桥接的作用，基本包括setStrategy方法和算法对应的方法。如下所示：<br>
+```java
+public interface CalculateStrategy {
+    int calculatePrice(int km);
+}
+```
+```java
+public class SubwayStrategy implements CalculateStrategy {
+    @Override
+    public int calculatePrice(int km) {
+        // 具体算法实现
+    }
+}
+```
+```java
+public class BusStrategy implements CalculateStrategy {
+    @Override
+    public int calculatePrice(int km) {
+        // 具体算法实现
+    }
+}
+```
+```java
+public class TrafficCalculator {
+
+    private CalculateStrategy mStrategy;
+
+    public void setStrategy(CalculateStrategy strategy) {
+        this.mStrategy = strategy;
+    }
+
+    public int calculatePrice(int km) {
+        return mStrategy.calculatePrice(km);
+    }
+
+    public static void main(String[] args) {
+        TrafficCalculator trafficCalculator = new TrafficCalculator();
+        // 设置计算价格策略为公交策略
+        trafficCalculator.setStrategy(new BusStrategy());
+        System.out.println("公交车乘16公里的价格是： " + trafficCalculator.calculatePrice(16));
+        // 设置计算价格策略为地铁策略
+        trafficCalculator.setStrategy(new SubwayStrategy());
+        System.out.println("地铁乘16公里的价格是： " + trafficCalculator.calculatePrice(16));
+    }
+
+}
+```
+
+#### android 源码中的策略模式实现
+动画中的插值器其实就是策略模式的体现，动画中存在着不同的插值器，包括线性插值器（LinearInterpolator），用于匀速动画；
+加速减速插值器(AccelerateDecelerateInterpolator)用于先加速后减速动画；减速插值器（DecelerateInterpolator）用于减速动画。
+
+##### 插值器-Interpolator
+它的作用是根据时间流逝的百分比计算出当前属性值改变的百分比。
+
+##### 类型估值器-TypeEvaluator
+它的作用是根据当前属性改变的百分比来计算改变后的属性值。
+
+#### 深入属性动画
+##### 属性动画体系的总体设计
+Animator通过PropertyValuesHolder来更新对象的目标属性，如果用户没有设置目标属性的Property对象，那么会通过反射的形式调用
+目标属性的setter方法来更新属性值；否则，通过Property的set方法来设置属性值。这个属性值则通过KeyFrameSet的计算得到，而KeyFrameSet
+又是通过时间插值器和类型估值器来计算，在动画执行过程中不断地计算当前时刻目标属性的值，然后更新属性值来达到动画效果。
+
+#### 小结
+策略模式主要用于分离算法，在相同的行为抽象下有不同的具体实现策略。这个模式很好的演示了开闭原则（OCP），也就是定义抽象，注入不同的实现，从而达到很好的可扩展性。
 
 
 ### 7. 状态模式
@@ -402,5 +478,5 @@ android中的view的事件分发就用到该模式。
 
 
 ## 致谢
-《Android源码设计模式解析与实战》(第2版) 何红辉 关爱民
+《Android源码设计模式解析与实战》(第2版) 何红辉 关爱民 <br>
 https://book.douban.com/subject/30199128/
