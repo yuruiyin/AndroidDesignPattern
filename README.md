@@ -443,7 +443,7 @@ Animator通过PropertyValuesHolder来更新对象的目标属性，如果用户�
 （2）代码中包含大量与对象状态有关的条件语句。例如，一个操作中含有庞大的多分支语句（if-else或switch-case），且这些分支依赖于该对象的状态。
 
 #### 如何使用
-参考代码
+参考代码: https://github.com/yuruiyin/AndroidDesignPattern/tree/master/designpattern/src/main/java/com/yuruiyin/designpattern/state
 
 #### WIFI管理中的状态模式
 在不同状态下对于扫描WIFI这个请求的处理是完全不一样的。在初始状态下扫描请求被直接忽略，在驱动加载中状态下WIFI扫描请求被添加到延迟处理的消息队列中，
