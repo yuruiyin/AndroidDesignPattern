@@ -455,12 +455,136 @@ Animator通过PropertyValuesHolder来更新对象的目标属性，如果用户�
 那么用户可以直接执行转发操作。
 
 #### 小结
-状态模式的核心就是使用多台来实现if-else。
+状态模式的核心就是使用多态来实现if-else。
 
 ### 8. 责任链模式
-android中的view的事件分发就用到该模式。
+#### 定义
+使多个对象都有机会处理请求，从而避免了请求的发送者和接收者之间的耦合关系。将这些对象连成一个链，并沿着这条链传递该请求，直到有对象处理它为止。
+将请求的发起者和处理者解耦。
+
+#### 简单实现
+<b>抽象领导类</b>
+```java
+public abstract class Leader {
+
+    protected Leader nextHandler;
+
+    public final void handleRequest(int money) {
+        if (money <= limit()) {
+            handle(money);
+        } else {
+            if (null != nextHandler) {
+                nextHandler.handleRequest(money);
+            }
+        }
+    }
+
+    /**
+     * 自身能批复的额度
+     * @return 额度
+     */
+    public abstract int limit();
+
+    /**
+     * 处理报账行为
+     * @param money 具体金额
+     */
+    public abstract void handle(int money);
+
+}
+```
+<b>各个具体的领导类</b>
+```java
+public class GroupLeader extends Leader {
+
+    @Override
+    public int limit() {
+        return 1000;
+    }
+
+    @Override
+    public void handle(int money) {
+        System.out.println("组长批复报销： " + money + "元");
+    }
+}
+
+public class Director extends Leader {
+    @Override
+    public int limit() {
+        return 5000;
+    }
+
+    @Override
+    public void handle(int money) {
+        System.out.println("主管批复报销： " + money + "元");
+    }
+}
+
+public class Manager extends Leader {
+    @Override
+    public int limit() {
+        return 10000;
+    }
+
+    @Override
+    public void handle(int money) {
+        System.out.println("经理批复报销： " + money + "元");
+    }
+}
+
+public class Boss extends Leader {
+    @Override
+    public int limit() {
+        return Integer.MAX_VALUE;
+    }
+
+    @Override
+    public void handle(int money) {
+        System.out.println("老板批复报销： " + money + "元");
+    }
+}
+```
+
+<b>客户类</b>
+```java
+public class Client {
+
+    public static void main(String[] args) {
+        // 构造各个领导对象
+        GroupLeader groupLeader = new GroupLeader();
+        Director director = new Director();
+        Manager manager = new Manager();
+        Boss boss = new Boss();
+
+        groupLeader.nextHandler = director;
+        director.nextHandler = manager;
+        manager.nextHandler = boss;
+
+        groupLeader.handleRequest(20000);
+    }
+
+}
+```
+说明：对于责任链的一个处理者对象，其只有两个行为，一个是处理请求，一个是将请求转送给下一个节点，不允许某个处理者对象在处理的请求之后又
+将请求转给下一个节点的情况。<br>
+<b>纯的责任链</b><br>
+请求最终被某个处理对象所处理；<br>
+<b>不纯的责任链</b><br>
+请求最终未被任何处理对象所处理；<br>
+
+#### Android源码中的责任链模式
+（1）view的事件分发。ViewGroup事件投递的递归调用就类似于一条责任链，一旦其寻找到责任者（某个view），那么将由责任者持有并消费掉这次事件。
+具体地体现在View的onTouchEvent方法中返回值的设置，如果onTouchEvent返回false，那么意味着当前View不会是该次事件的责任人，将不会
+对其持有；如果为true则相反，此时view会持有该事件并不再向外传递。<br>
+（2）有序广播。有序广播是根据优先级一次传播的，直到有接收者将其终止或所有接收者都不终止它。
+
+#### 小结
+优点：可以将请求者和处理者进行解耦，提高代码的灵活性。<br>
+缺点：对链中请求处理者的遍历，如果处理太多，那么遍历必定会影响性能，特别是一些递归调用中，要慎重。
+
 
 ### 9. 解释器模式
+TODO
 
 ### 10. 命令模式
 
