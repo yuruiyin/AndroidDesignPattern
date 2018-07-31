@@ -847,7 +847,7 @@ ReceiverDispatcher将广播分发给各个订阅对象，从而完成这个发�
 （1）相比使用广播接收器实现Activity、Fragment、service之间的数据传递，通过事件总线的方法可以简化操作，并降低组件之间的耦合。<br>
 （2）一般都包括一个tag和一个mode，tag就是一个action，mode就是该订阅函数的执行线程。<br>
 （3）总线也需要register和unregister的过程，因为总线的生命周期是全局的，跟Application一样，它持有了Activity,就必须
-在Activity销毁的时候unregister掉，否则会造成Activity对象总线对象引用而无法被GC回收，而造成Activity的内存泄漏。
+在Activity销毁的时候unregister掉，否则会造成Activity对象被总线对象引用而无法被GC回收，而造成Activity的内存泄漏。
 
 #### 其它
 （1）通过广播接收器发送的实体类必须实现序列化接口。
