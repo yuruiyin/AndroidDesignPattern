@@ -633,6 +633,231 @@ android的事件机制中底层逻辑对事件的转发处理。接收者就是�
 更弱的耦合性、更灵活的控制性以及更好的扩展性。
 
 ### 11. 观察者模式
+使用java util中的Observable抽象类，里面的notifyObservers是逆序调用observers通知更新的。
+#### 定义
+观察者模式是一个使用频率非常高的模式，它常用的地方就是GUI系统、订阅-发布系统。定义对象间一种一对多的依赖关系，使得每当一个对象改变
+状态，则所有依赖于它的对象都会得到通知并被自动更新。目的依然是为了解耦。
+
+#### 使用场景
+（1）关联行为场景，需要注意的是，关联行为是可拆分的，而不是“组合”关系；<br> 
+（2）事件多级触发场景；<br>
+（3）跨系统的消息交换场景，如消息队列、事件总线的处理机制。
+
+#### 观察者模式的角色介绍
+（1）Subject：抽象主题，也就是被观察者（Observable）的角色；<br>
+（2）ConcreteSubject：具体主题. <br>
+（3）Observer：抽象观察者；<br>
+（4）ConcreteObserver：具体观察者。
+
+#### 观察者模式的简单实现
+```java
+public class Coder implements Observer {
+
+    private String name;
+
+    public Coder(String name) {
+        this.name = name;
+    }
+
+    @Override
+    public void update(Observable observable, Object arg) {
+        System.out.println("Hi, " + name + ", 开发技术前线更新啦， 内容：" + arg);
+    }
+}
+
+public class DevTechFrontier extends Observable {
+
+    public void postNewPublication(String content) {
+        // 标识状态或内容发生改变
+        setChanged();
+        // 通知所有观察者
+        notifyObservers(content);
+    }
+
+    /**
+     * 批量添加观察者
+     * @param observers 观察者列表
+     */
+    public void addObservers(Observer ...observers) {
+        for (Observer observer : observers) {
+            addObserver(observer);
+        }
+    }
+
+}
+
+public class Test {
+
+    public static void main(String[] args) {
+        // 被观察者
+        DevTechFrontier devTechFrontier = new DevTechFrontier();
+        // 若干观察者
+        Coder coder1 = new Coder("coder1");
+        Coder coder2 = new Coder("coder2");
+        Coder coder3 = new Coder("coder3");
+
+        // 将观察者注册到被观察者的观察者列表中
+        devTechFrontier.addObservers(coder1, coder2, coder3);
+
+        // 发布消息
+        devTechFrontier.postNewPublication("新的一期开发技术前线周报发布啦！");
+    }
+
+}
+```
+#### Android源码中的观察者模式--RecyclerView
+RecyclerView和ListView的Adapter都使用到了观察者模式。这里拿RecyclerView来分析: <br>
+（1）首先，在RecyclerView实例化的时候就会创建一个Observer，如下：
+```java
+public class RecyclerView extends ViewGroup implements ScrollingView, NestedScrollingChild {
+    // 省略其它代码
+    private final RecyclerViewDataObserver mObserver = new RecyclerViewDataObserver();
+    // 省略其它代码
+}
+
+```
+（2）接着，当我们new RecyclerView.Adapter的时候，就会创建一个Observable，如下：
+```java
+public abstract static class Adapter<VH extends ViewHolder> {
+    private final AdapterDataObservable mObservable = new AdapterDataObservable();
+    // 省略其它代码
+}
+```
+（3）此时，已经有了Observer和Observable，那是什么时候将Observer注册进Observable中呢？答案是当setAdapter的时候，如下：
+```java
+    public void setAdapter(Adapter adapter) {
+        // bail out if layout is frozen
+        setLayoutFrozen(false);
+        setAdapterInternal(adapter, false, true);  // 这个方法
+        requestLayout();
+    }
+
+    private void setAdapterInternal(Adapter adapter, boolean compatibleWithPrevious,
+            boolean removeAndRecycleViews) {
+        // 省略其它代码
+        if (adapter != null) {
+            adapter.registerAdapterDataObserver(mObserver);  // 这里执行了注册操作
+            adapter.onAttachedToRecyclerView(this);
+        }
+        // 省略其它代码
+    }
+    
+    // 然后看Adapter的registerAdapterDataObserver方法
+    public abstract static class Adapter<VH extends ViewHolder> {
+        // 省略其它代码
+        public void registerAdapterDataObserver(AdapterDataObserver observer) {
+            mObservable.registerObserver(observer); 
+        }
+        // 省略其它代码
+    }
+    
+    // 最后看看Observable这个类，里面有一个ArrayList来存储Observers，以及实现了注册和解注册方法
+    public abstract class Observable<T> {
+        // 观察者列表
+        protected final ArrayList<T> mObservers = new ArrayList<T>();
+    
+        /**
+         * 注册观察者，即将观察者添加到观察者列表中
+         */
+        public void registerObserver(T observer) {
+            if (observer == null) {
+                throw new IllegalArgumentException("The observer is null.");
+            }
+            synchronized(mObservers) {
+                if (mObservers.contains(observer)) {
+                    throw new IllegalStateException("Observer " + observer + " is already registered.");
+                }
+                mObservers.add(observer);
+            }
+        }
+    
+        /**
+         * 解注册观察者，即将观察者从观察者列表中移除
+         */
+        public void unregisterObserver(T observer) {
+            if (observer == null) {
+                throw new IllegalArgumentException("The observer is null.");
+            }
+            synchronized(mObservers) {
+                int index = mObservers.indexOf(observer);
+                if (index == -1) {
+                    throw new IllegalStateException("Observer " + observer + " was not registered.");
+                }
+                mObservers.remove(index);
+            }
+        }
+    
+        /**
+         * 移除所有的观察者
+         */
+        public void unregisterAll() {
+            synchronized(mObservers) {
+                mObservers.clear();
+            }
+        }
+    }
+
+```
+（4）通过以上三步，就成功地将观察者注册到被观察者中。接下来看看观察者模式的更新流程。
+```java
+    public abstract static class Adapter<VH extends ViewHolder> {
+        // 省略其它代码
+        public final void notifyDataSetChanged() {
+            mObservable.notifyChanged();
+        }
+        // 省略其它代码
+    }
+    
+    // 我们来看看Observable的notifyChanged()方法
+    static class AdapterDataObservable extends Observable<AdapterDataObserver> {
+        public void notifyChanged() {
+            // 通知所有的观察者更新，这里正常情况下，应该只会存在一个观察者
+            for (int i = mObservers.size() - 1; i >= 0; i--) {
+                // 以下的onChanged方法，实际上调用的是RecyclerViewDataObserver的onChange方法
+                mObservers.get(i).onChanged();
+            }
+        }
+    }
+    
+    // 我们再来看看RecyclerViewDataObserver的onChange方法，里头调用了requestLayout重新布局RecyclerView。
+    private class RecyclerViewDataObserver extends AdapterDataObserver {
+        // 省略其它代码
+        @Override
+        public void onChanged() {
+            assertNotInLayoutOrScroll(null);
+            mState.mStructureChanged = true;
+
+            setDataSetChangedAfterLayout();
+            if (!mAdapterHelper.hasPendingUpdates()) {
+                requestLayout(); // 请求对RecyclerView重新布局，更新用户界面
+            }
+        }
+        // 省略其它代码
+    }
+```
+至此，RecyclerView中使用观察者模式进行数据更新的流程基本完毕，具体的细节还是需要去细细读一下源码。
+
+#### Android源码中的观察者模式--BroadcastReceiver
+（1）广播的发送和接收都是以ActivityManagerService为中心的。<br>
+（2）简单来说，广播就是一个订阅--发布的过程，也就是观察者模式，通过一些map存储BroadcastReceiver，key就是封装了这些广播的信息类，
+如Action之类的。当发布一个广播时通过AMS到这个map中查询注册了这个广播的IntentFilter的BroadcastReceiver，然后通过
+ReceiverDispatcher将广播分发给各个订阅对象，从而完成这个发布--订阅过程。
+
+#### 事件总线实现组件之间的通信
+（1）相比使用广播接收器实现Activity、Fragment、service之间的数据传递，通过事件总线的方法可以简化操作，并降低组件之间的耦合。<br>
+（2）一般都包括一个tag和一个mode，tag就是一个action，mode就是该订阅函数的执行线程。<br>
+（3）总线也需要register和unregister的过程，因为总线的生命周期是全局的，跟Application一样，它持有了Activity,就必须
+在Activity销毁的时候unregister掉，否则会造成Activity对象总线对象引用而无法被GC回收，而造成Activity的内存泄漏。
+
+#### 其它
+（1）通过广播接收器发送的实体类必须实现序列化接口。
+
+#### 小结
+总之，观察者模式天生就是为了解耦而存在的，将观察者和被观察者隔离。可以非常灵活的应对业务变化。
+
+##### 缺点
+在java中消息的通知默认是顺序执行，一个观察者卡顿，会影响整体的执行效率，在这种情况下，一般考虑采用异步的方式。
+
 
 ### 12. 备忘录模式
 
