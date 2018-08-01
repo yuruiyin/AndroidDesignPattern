@@ -1,4 +1,4 @@
-package com.yuruiyin.designpattern.iterator;
+package com.yuruiyin.designpattern.chain;
 
 /**
  * <p>Title: </p>
@@ -9,15 +9,14 @@ package com.yuruiyin.designpattern.iterator;
  * @author yuruiyin
  * @version 2018/7/30
  */
-public class GroupLeader extends Leader {
-
+public class Boss extends Leader {
     @Override
     public int limit() {
-        return 1000;
+        return Integer.MAX_VALUE;
     }
 
     @Override
     public void handle(int money) {
-        System.out.println("组长批复报销： " + money + "元");
+        System.out.println("老板批复报销： " + money + "元");
     }
 }

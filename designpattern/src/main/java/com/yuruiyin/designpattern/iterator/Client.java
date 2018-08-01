@@ -7,22 +7,22 @@ package com.yuruiyin.designpattern.iterator;
  * <P>Company: 17173</p>
  *
  * @author yuruiyin
- * @version 2018/7/30
+ * @version 2018/8/1
  */
 public class Client {
 
     public static void main(String[] args) {
-        // 构造各个领导对象
-        GroupLeader groupLeader = new GroupLeader();
-        Director director = new Director();
-        Manager manager = new Manager();
-        Boss boss = new Boss();
+        Aggregate<String> aggregate = new ConcreteAggregate<>();
 
-        groupLeader.nextHandler = director;
-        director.nextHandler = manager;
-        manager.nextHandler = boss;
+        aggregate.add("Android");
+        aggregate.add("studio");
+        aggregate.add("design");
+        aggregate.add("pattern");
 
-        groupLeader.handleRequest(20000);
+        Iterator<String> iterator = aggregate.iterator();
+        while (iterator.hasNext()) {
+            System.out.println(iterator.next());
+        }
     }
 
 }

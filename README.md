@@ -907,6 +907,123 @@ onSaveInstanceState是在onStop之前执行的。<br>
 
 
 ### 13. 迭代器模式
+#### 定义
+提供一种方法顺序访问一个容器对象中的各个元素，而又不需要暴露该对象的内部表示。
+
+#### 使用场景
+遍历一个容器对象时。
+
+#### 简单实现
+```java
+// 迭代器接口
+public interface Iterator<T> {
+
+    /**
+     * 是否还有下一个元素
+     * @return true表示有，false表示没有
+     */
+    boolean hasNext();
+
+    /**
+     * 返回当前位置的元素并将位置后移
+     * @return 当前位置的元素
+     */
+    T next();
+
+}
+
+// 具体迭代器类
+public class ConcreteIterator<T> implements Iterator<T> {
+
+    private List<T> mList = new ArrayList<T>();
+    private int cursor = 0;
+
+    public ConcreteIterator(List<T> list) {
+        mList = list;
+    }
+
+    @Override
+    public boolean hasNext() {
+        return cursor != mList.size();
+    }
+
+    @Override
+    public T next() {
+        T obj = null;
+        if (this.hasNext()) {
+            obj = this.mList.get(cursor++);
+        }
+        return obj;
+    }
+}
+
+// 容器接口
+public interface Aggregate<T> {
+
+    /**
+     * 添加一个元素
+     * @param obj 元素
+     */
+    void add(T obj);
+
+    /**
+     * 删除一个元素
+     * @param obj 元素
+     */
+    void remove(T obj);
+
+    /**
+     * 获取容器的迭代器
+      * @return 迭代器
+     */
+    Iterator<T> iterator();
+}
+
+// 具体容器类
+public class ConcreteAggregate<T> implements Aggregate<T> {
+    private List<T> mList = new ArrayList<>();
+
+    @Override
+    public void add(T obj) {
+        mList.add(obj);
+    }
+
+    @Override
+    public void remove(T obj) {
+        mList.remove(obj);
+    }
+
+    @Override
+    public Iterator<T> iterator() {
+        return new ConcreteIterator<>(mList);
+    }
+}
+
+// 客户端测试类
+public class Client {
+
+    public static void main(String[] args) {
+        Aggregate<String> aggregate = new ConcreteAggregate<>();
+
+        aggregate.add("Android");
+        aggregate.add("design");
+        aggregate.add("pattern");
+
+        Iterator<String> iterator = aggregate.iterator();
+        while (iterator.hasNext()) {
+            System.out.println(iterator.next());
+        }
+    }
+
+}
+```
+
+#### Android源码中的迭代器模式
+（1）各种数据结构，如List，Map，Set等都包含迭代器。<br>
+（2）android的sqlite数据库中的cursor其实也是一个迭代器。<br>
+
+#### 小结
+迭代器模式发展至今，几乎每一种高级语言都有相应的内置实现，几乎不需要开发者去自己实现迭代器了。
 
 ### 14. 模板方法模式
 

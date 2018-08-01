@@ -1,4 +1,4 @@
-package com.yuruiyin.designpattern.iterator;
+package com.yuruiyin.designpattern.chain;
 
 /**
  * <p>Title: 责任链模式之公司报销流程</p>
