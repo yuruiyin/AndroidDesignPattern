@@ -1,3 +1,6 @@
 <resources>
     <string name="app_name">AndroidDesignPattern</string>
+    <string name="title_activity_memonto">MemontoActivity</string>
+
+    <string name="note_edittext_hint">写点东西吧...</string>
 </resources>

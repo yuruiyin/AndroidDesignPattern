@@ -860,6 +860,51 @@ ReceiverDispatcher将广播分发给各个订阅对象，从而完成这个发�
 
 
 ### 12. 备忘录模式
+#### 定义
+备忘录模式是一种行为模式，该模式用于保存对象当前状态，并且在之后可以再次恢复到此状态，这有点像我们平时说的“后悔药”。
+在不破坏封闭的前提下，捕获一个对象的内部状态，并在该对象之外保存这个状态，这样，以后就可将该对象恢复到原先保存的状态。
+
+#### 使用场景
+（1）需要保存一个对象的某一个时刻的状态或部分状态。<br>
+（2）如果用一个接口来让其他对象得到这些状态，将会暴露对象的实现细节并破坏对象的封装性，一个对象不希望外界直接访问其内部状态，
+通过中间对象可以间接访问其内部状态。
+
+#### 备忘录模式的角色介绍
+（1）Originator：负责创建一个备忘录，可以记录、恢复自身的内部状态; <br>
+（2）Memento: 备忘录角色，用于存储Originator的内部状态，并且防止Originator以外的对象访问Memonto; <br>
+（3）Caretaker: 负责存储备忘录，不能对备忘录的内容进行操作和访问，只能够将备忘录传递给其它对象。
+
+#### Android源码中的备忘录模式
+Activity中的状态保存，也就是onSaveInstanceState和onRestoreInstanceState。
+
+##### onSaveInstanceState
+onSaveInstanceState主要分成以下三个步骤：<br>
+（1）存储窗口的视图树的状态(saveHierarchyState), 主要存储了与当前UI、ActionBar相关的View状态，而View中的saveHierarchyState
+实际上调用的是dispatchSaveInstanceState来存储自身的状态。ViewGroup则是遍历子View调用子View的dispatchSaveInstanceState。
+不过，若View中没有设置id时，这个View的状态是不会被存储的到Bundle中的；<br>
+（2）存储Fragment的状态； <br>
+（3）调用Activity的ActivityLifecycleCallbacks的onSaveInstanceState函数进行状态存储。 <br>
+
+onSaveInstanceState是在onStop之前执行的。<br>
+##### Bundle存储在哪？
+存储在ActivityClientRecord对象的state字段中。
+
+##### onSaveInstanceState的调用时机
+笼统的讲，就是当Activity变得容易被系统销毁时，该Activity的onSaveInstanceState函数就会被执行。用户主动按Back键返回时，是不会调用的。<br>
+具体的时机如下：<br>
+（1）当用户按下home键回到桌面时；<br>
+（2）按menu键准备切换程序时；<br>
+（3）按下电源键关闭屏幕时；<br>
+（4）从Activity A跳转到Activity B; <br>
+（5）屏幕方向切换，如从竖屏切换到横屏；<br>
+（6）电话打入等情况发生时；<br>
+
+#### 实现了undo/redo功能的EditText
+参考代码: https://github.com/yuruiyin/AndroidDesignPattern/tree/master/app/src/main/java/com/yuruiyin/androiddesignpattern/memonto
+
+#### 小结
+备忘录模式是在不破坏封装的条件下，通过备忘录对象（Memonto）存储另一个对象内部状态的快照，在将来合适的时候把这个对象还原到存储起来的状态。
+
 
 ### 13. 迭代器模式
 

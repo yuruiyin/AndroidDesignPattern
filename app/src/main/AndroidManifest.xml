@@ -19,6 +19,13 @@
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
+        <activity android:name=".SecondActivity"/>
+        <activity
+            android:name=".NoteActivity"
+            android:label="@string/title_activity_memonto"
+            android:windowSoftInputMode="adjustResize|stateHidden|stateUnchanged"
+            >
+        </activity>
     </application>
 
 </manifest>
