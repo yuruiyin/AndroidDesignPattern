@@ -1026,6 +1026,47 @@ public class Client {
 迭代器模式发展至今，几乎每一种高级语言都有相应的内置实现，几乎不需要开发者去自己实现迭代器了。
 
 ### 14. 模板方法模式
+#### 定义
+定义一个操作中的算法的框架，而将一些步骤延迟到子类中，使得子类可以不改变一个算法的结构即可重定义该算法的某些特定步骤。
+
+#### 使用场景
+（1）多个子类有公有的方法时，并且逻辑基本相同时；<br>
+（2）重要、复杂的算法，可以把核心算法设计为模板方法，周边的相关细节功能则由各个子类实现；<br>
+（3）重构时，模板方法模式是一个经常使用的模式，把相同的代码抽取到父类中，然后通过钩子函数约束其行为。
+
+#### 角色介绍
+（1）AbsTemplate: 抽象类，定义一套算法框架；<br>
+（2）ConcreteImplA：具体实现类A；<br>
+（3）ConcreteImplB：具体实现类B；<br>
+
+#### 代码实现
+https://github.com/yuruiyin/AndroidDesignPattern/tree/master/designpattern/src/main/java/com/yuruiyin/designpattern/template
+
+#### Android源码中的模板方法模式-AsyncTask
+AsyncTask中的execute方法里面顺序执行onPreExecute --> doInBackground --> onPostExecute。而且execute为final方法，不可被重写。
+相当于算法框架是固定的。但是用户可以根据自己的需要重写onPreExecute，doInBackground和onPostExecute。
+
+#### Android源码中的模板方法模式--Activity的生命周期函数
+（1）我们知道，在Android系统启动时，第一个启动的进程是zygote进程，然后由zygote启动SystemServer，再后就是启动ActivityManagerService、
+WindowManagerService等系统核心服务，这些服务承载着整个android系统与客户端程序交互的重担。zygote除了启动系统服务与进程之外，
+普通的用户进程也是由zygote进程fork而来，当一个应用进程启动起来后，就会加载用户在AndroidManifest.xml中配置的默认加载的Activity，
+此时加载的入口是ActivityThread的main方法，这个main方法就是整个应用程序的入口。<br>
+（2）在调用了ActivityThread的main方法之后，会一次执行Activity的onCreate、onStart和onResume方法。这就是典型的模板方法。<br>
+（3）渲染视图的工作是由ActivityManagerService完成的。<br>
+（4）用户的布局视图是添加到decor view的content view 区域的。decor view包括title区域和content区域。<br>
+（5）ViewGroup是继承于View，其实是视图的容器。界面的视图树即可通过ViewGroup和View来构建，view是叶子节点，ViewGroup是非叶子节点。<br>
+
+#### 小结
+模板方法模式用4个字概括就是：流程封装。也就是把某个固定的流程封装到一个final函数中，并且让子类能够定制这个流程中的某些或者所有步骤，
+这就要求父类提取共用的代码，提升代码的复用率，同时也带来了更好的可扩展性。<br>
+
+##### 优点
+（1）封装不可变部分，扩展可变部分;<br>
+（2）提取公共部分代码，便于维护。
+
+##### 缺点
+模板方法会带来代码阅读的难度，会让用户觉得难以理解。
+
 
 ### 15. 访问者模式
 
